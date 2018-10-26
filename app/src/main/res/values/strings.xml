@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">FootballMatch</string>
+    <string name="prev_match">Prev. Match</string>
+    <string name="next_match">Next Match</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="error_title_no_internet">No Internet</string>
+    <string name="error_title_timeout">Connection Timeout</string>
+    <string name="error_title_connection_unstable">Connection Unstable</string>
+    <string name="error_response">Response Error</string>
+
+    <string name="error_message_no_internet">No connected to the Internet</string>
+    <string name="error_message_timeout">Connection is Timeout</string>
+    <string name="error_message_connection_unstable">Connection is unstable</string>
+    <string name="error_response_message">Cannot read response </string>
+
+    <string name="home">home</string>
+    <string name="away">away</string>
+    <string name="vs">vs.</string>
+    <string name="no_data">No Data Available</string>
+
+
+
+    <string name="goals">Goals</string>
+    <string name="shots">Shots</string>
+    <string name="lineups">Lineups</string>
+    <string name="goal_keeper">Goal Keeper</string>
+    <string name="defense">Defense</string>
+    <string name="midfield">Midfield</string>
+    <string name="forward">Forward</string>
+    <string name="substitutes">Substitutes</string>
+</resources>
