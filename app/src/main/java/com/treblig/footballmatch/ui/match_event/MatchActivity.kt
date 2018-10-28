@@ -7,7 +7,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -41,6 +40,13 @@ class MatchActivity : BaseActivity<MatchPresenter>(), MatchView {
         setView()
 
         presenter.onViewCreated()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (presenter.matchType == Match.FAVORITE) {
+            presenter.showFavorite()
+        }
     }
 
     private fun setView() {
@@ -98,6 +104,7 @@ class MatchActivity : BaseActivity<MatchPresenter>(), MatchView {
                         add(R.string.prev_match)
                                 .setIcon(R.drawable.ic_result)
                                 .setOnMenuItemClickListener {
+                                    this@MatchActivity.spinner.visible()
                                     val league = spinner.selectedItem as League
                                     presenter.getPrevMatch(league.id)
                                     false
@@ -106,8 +113,17 @@ class MatchActivity : BaseActivity<MatchPresenter>(), MatchView {
                         add(R.string.next_match)
                                 .setIcon(R.drawable.ic_schedule)
                                 .setOnMenuItemClickListener {
+                                    this@MatchActivity.spinner.visible()
                                     val league = spinner.selectedItem as League
                                     presenter.getNextMatch(league.id)
+                                    false
+                                }
+
+                        add(R.string.favorite)
+                                .setIcon(R.drawable.ic_favorited)
+                                .setOnMenuItemClickListener {
+                                    this@MatchActivity.spinner.invisible()
+                                    presenter.showFavorite()
                                     false
                                 }
                     }

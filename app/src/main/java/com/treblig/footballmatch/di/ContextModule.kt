@@ -6,7 +6,6 @@ import com.treblig.footballmatch.ui.base.BaseView
 import dagger.Module
 import dagger.Provides
 
-
 @Module
 object ContextModule {
     @Provides
@@ -21,9 +20,3 @@ object ContextModule {
         return context.applicationContext as Application
     }
 }
-
-
-
-
-
-

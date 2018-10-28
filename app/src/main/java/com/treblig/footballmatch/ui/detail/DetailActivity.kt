@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.view.Gravity
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -21,9 +22,11 @@ import com.treblig.footballmatch.util.DateTime
 import com.treblig.footballmatch.util.invisible
 import com.treblig.footballmatch.util.visible
 import org.jetbrains.anko.*
+import org.jetbrains.anko.design.snackbar
 
 class DetailActivity : BaseActivity<DetailPresenter>(), DetailView {
-
+    private var optionMenu: Menu? = null
+    private lateinit var matchEvent: Event
     private lateinit var progressBar: ProgressBar
     private lateinit var scrollView: ScrollView
     private lateinit var imgHomeBadge: ImageView
@@ -31,7 +34,7 @@ class DetailActivity : BaseActivity<DetailPresenter>(), DetailView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val matchEvent = intent.getParcelableExtra<Event>(MatchActivity.EXTRA_EVENT)
+        matchEvent = intent.getParcelableExtra<Event>(MatchActivity.EXTRA_EVENT)
         setView(matchEvent)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -40,9 +43,19 @@ class DetailActivity : BaseActivity<DetailPresenter>(), DetailView {
         presenter.getTeamDetail(matchEvent.idHomeTeam!!, matchEvent.idAwayTeam!!)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_favorite, menu)
+        optionMenu = menu
+        presenter.refreshFavorite(matchEvent)
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return if (item?.itemId == android.R.id.home) {
             finish()
+            true
+        } else if (item?.itemId == R.id.add_to_favorite) {
+            presenter.changeFavorite(matchEvent)
             true
         } else {
             super.onOptionsItemSelected(item)
@@ -324,10 +337,22 @@ class DetailActivity : BaseActivity<DetailPresenter>(), DetailView {
 
     override fun showHomeTeamDetail(team: Team) {
         Glide.with(this).load(team.strTeamBadge).into(imgHomeBadge)
-
     }
 
     override fun showAwayTeamDetail(team: Team) {
         Glide.with(this).load(team.strTeamBadge).into(imgAwayBadge)
+    }
+
+    override fun setViewIsFavorites(isFavorite: Boolean, showSnackBar: Boolean) {
+        optionMenu?.getItem(0)?.icon = when (isFavorite) {
+            true -> ContextCompat.getDrawable(this, R.drawable.ic_added_to_favorites)
+            false -> ContextCompat.getDrawable(this, R.drawable.ic_add_to_favorites)
+        }
+        when {
+            showSnackBar -> {
+                val message = getString(if (isFavorite) R.string.added_to_favorite else R.string.removed_from_favorite)
+                snackbar(this.scrollView, message).show()
+            }
+        }
     }
 }

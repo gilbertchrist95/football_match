@@ -1,5 +1,6 @@
 package com.treblig.footballmatch.util
 
+import android.annotation.SuppressLint
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -17,5 +18,10 @@ object DateTime {
             e.printStackTrace()
         }
         return result
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    fun toSimpleString(date: Date?):String? = with(date?: Date()){
+        SimpleDateFormat("EEE, dd MM yyyy").format(this)
     }
 }

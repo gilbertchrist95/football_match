@@ -1,11 +1,14 @@
 package com.treblig.footballmatch.ui.match_event
 
 import com.treblig.footballmatch.api.TheSportApi
+import com.treblig.footballmatch.db.MatchEventDB
 import com.treblig.footballmatch.pojo.MatchEventResponse
 import com.treblig.footballmatch.ui.base.BasePresenter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import javax.inject.Inject
 
 
@@ -39,6 +42,7 @@ class MatchPresenter(matchView: MatchView) : BasePresenter<MatchView>(matchView)
                     when (matchType) {
                         Match.PREV -> getPrevMatch(league.id)
                         Match.NEXT -> getNextMatch(league.id)
+                        Match.FAVORITE -> showFavorite()
                     }
 
                 }, {
@@ -56,7 +60,7 @@ class MatchPresenter(matchView: MatchView) : BasePresenter<MatchView>(matchView)
                 .subscribe({
                     processEventResponse(it)
                     view.hideLoading()
-                },{
+                }, {
                     view.hideLoading()
                     view.showError(it)
                 })
@@ -83,7 +87,7 @@ class MatchPresenter(matchView: MatchView) : BasePresenter<MatchView>(matchView)
                 .subscribe({
                     processEventResponse(it)
                     view.hideLoading()
-                },{
+                }, {
                     view.hideLoading()
                     view.showError(it)
                 })
@@ -94,6 +98,21 @@ class MatchPresenter(matchView: MatchView) : BasePresenter<MatchView>(matchView)
         allLeagues?.dispose()
         prevMatch?.dispose()
         nextMatch?.dispose()
+    }
+
+    fun showFavorite() {
+        matchType = Match.FAVORITE
+        view.showLoading()
+        doAsync {
+            val favoriteList = MatchEventDB.getFavorites(context = view.getContext())
+            uiThread {
+                when (favoriteList != null && favoriteList.isNotEmpty()) {
+                    true -> view.showEvents(favoriteList!!)
+                    false -> view.showNoDataAvailable()
+                }
+                view.hideLoading()
+            }
+        }
     }
 }
 
