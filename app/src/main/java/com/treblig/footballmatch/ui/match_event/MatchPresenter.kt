@@ -4,9 +4,9 @@ import com.treblig.footballmatch.api.TheSportApi
 import com.treblig.footballmatch.db.MatchEventDB
 import com.treblig.footballmatch.pojo.MatchEventResponse
 import com.treblig.footballmatch.ui.base.BasePresenter
-import io.reactivex.android.schedulers.AndroidSchedulers
+import com.treblig.footballmatch.util.ioThread
+import com.treblig.footballmatch.util.mainThread
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import javax.inject.Inject
@@ -27,24 +27,15 @@ class MatchPresenter(matchView: MatchView) : BasePresenter<MatchView>(matchView)
         getAllLeagues()
     }
 
-    private fun getAllLeagues() {
+    fun getAllLeagues() {
         view.showLoading()
 
         allLeagues = theSportApi.getAllLeagues()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(ioThread())
+                .observeOn(mainThread())
                 .subscribe({
-
                     view.hideLoading()
                     view.showAllLeagues(it.leagues)
-                    val league = view.getSelectedLeague()
-
-                    when (matchType) {
-                        Match.PREV -> getPrevMatch(league.id)
-                        Match.NEXT -> getNextMatch(league.id)
-                        Match.FAVORITE -> showFavorite()
-                    }
-
                 }, {
                     view.hideLoading()
                     view.showError(it)
@@ -55,11 +46,10 @@ class MatchPresenter(matchView: MatchView) : BasePresenter<MatchView>(matchView)
         matchType = Match.PREV
         view.showLoading()
         prevMatch = theSportApi.getPrevLeagueEvents(id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(ioThread())
+                .observeOn(mainThread())
                 .subscribe({
                     processEventResponse(it)
-                    view.hideLoading()
                 }, {
                     view.hideLoading()
                     view.showError(it)
@@ -82,11 +72,10 @@ class MatchPresenter(matchView: MatchView) : BasePresenter<MatchView>(matchView)
         matchType = Match.NEXT
         view.showLoading()
         prevMatch = theSportApi.getNextLeagueEvents(id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(ioThread())
+                .observeOn(mainThread())
                 .subscribe({
                     processEventResponse(it)
-                    view.hideLoading()
                 }, {
                     view.hideLoading()
                     view.showError(it)

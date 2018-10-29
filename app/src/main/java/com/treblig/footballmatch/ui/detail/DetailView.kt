@@ -4,7 +4,6 @@ import com.treblig.footballmatch.pojo.Team
 import com.treblig.footballmatch.ui.base.BaseView
 
 interface DetailView : BaseView {
-    fun showHomeTeamDetail(team: Team)
-    fun showAwayTeamDetail(team: Team)
+    fun showTeamDetail(team: Team)
     fun setViewIsFavorites(isFavorited: Boolean, showSnackBar: Boolean = false)
 }

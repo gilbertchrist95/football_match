@@ -2,10 +2,10 @@ package com.treblig.footballmatch.di
 
 import com.treblig.footballmatch.BuildConfig
 import com.treblig.footballmatch.api.TheSportApi
+import com.treblig.footballmatch.util.ioThread
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
-import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -38,7 +38,7 @@ object NetworkModule{
         return Retrofit.Builder()
                 .baseUrl(BuildConfig.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(ioThread()))
                 .client(provideOkHttp())
                 .build()
     }

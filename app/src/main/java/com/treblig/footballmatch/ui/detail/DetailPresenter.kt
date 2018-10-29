@@ -4,8 +4,8 @@ import com.treblig.footballmatch.api.TheSportApi
 import com.treblig.footballmatch.db.MatchEventDB
 import com.treblig.footballmatch.pojo.Event
 import com.treblig.footballmatch.ui.base.BasePresenter
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.treblig.footballmatch.util.ioThread
+import com.treblig.footballmatch.util.mainThread
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import javax.inject.Inject
@@ -15,21 +15,17 @@ class DetailPresenter(detailView: DetailView) : BasePresenter<DetailView>(detail
     @Inject
     lateinit var theSportApi: TheSportApi
 
-    fun getTeamDetail(homeId: String, awayId: String) {
+    fun getTeamDetail(teamId: String) {
         view.showLoading()
 
-        theSportApi.lookUpTeam(homeId)
-                .mergeWith(theSportApi.lookUpTeam(awayId))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        theSportApi.lookUpTeam(teamId)
+                .subscribeOn(ioThread())
+                .observeOn(mainThread())
                 .subscribe({ response ->
                     response?.let {
-                        if (it.teams != null) {
+                        if (it.teams != null && it.teams.isNotEmpty()) {
                             val team = it.teams[0]
-                            when (team.idTeam) {
-                                homeId -> view.showHomeTeamDetail(team)
-                                else -> view.showAwayTeamDetail(team)
-                            }
+                            view.showTeamDetail(team)
                         } else {
                             view.hideLoading()
                         }

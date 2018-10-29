@@ -25,6 +25,8 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.design.snackbar
 
 class DetailActivity : BaseActivity<DetailPresenter>(), DetailView {
+
+
     private var optionMenu: Menu? = null
     private lateinit var matchEvent: Event
     private lateinit var progressBar: ProgressBar
@@ -40,7 +42,8 @@ class DetailActivity : BaseActivity<DetailPresenter>(), DetailView {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "${matchEvent.strHomeTeam} vs. ${matchEvent.strAwayTeam}"
 
-        presenter.getTeamDetail(matchEvent.idHomeTeam!!, matchEvent.idAwayTeam!!)
+        presenter.getTeamDetail(matchEvent.idHomeTeam!!)
+        presenter.getTeamDetail(matchEvent.idAwayTeam!!)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -335,11 +338,18 @@ class DetailActivity : BaseActivity<DetailPresenter>(), DetailView {
         progressBar.invisible()
     }
 
-    override fun showHomeTeamDetail(team: Team) {
+    override fun showTeamDetail(team: Team) {
+        when (team.idTeam) {
+            matchEvent.idHomeTeam -> showHomeTeamDetail(team)
+            matchEvent.idAwayTeam -> showAwayTeamDetail(team)
+        }
+    }
+
+    fun showHomeTeamDetail(team: Team) {
         Glide.with(this).load(team.strTeamBadge).into(imgHomeBadge)
     }
 
-    override fun showAwayTeamDetail(team: Team) {
+    fun showAwayTeamDetail(team: Team) {
         Glide.with(this).load(team.strTeamBadge).into(imgAwayBadge)
     }
 

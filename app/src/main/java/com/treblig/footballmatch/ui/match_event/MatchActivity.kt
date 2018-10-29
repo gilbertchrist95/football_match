@@ -58,6 +58,7 @@ class MatchActivity : BaseActivity<MatchPresenter>(), MatchView {
                 backgroundColor = Color.LTGRAY
 
                 spinner = spinner {
+                    id = R.id.spinner
                     padding = dip(16)
                     minimumHeight = dip(80)
                 }
@@ -81,6 +82,7 @@ class MatchActivity : BaseActivity<MatchPresenter>(), MatchView {
                 }
 
                 recyclerView = recyclerView {
+                    id = R.id.recyclerView
                     layoutManager = LinearLayoutManager(ctx)
                     adapter = matchAdapter
                 }.lparams(matchParent, matchParent) {
@@ -88,6 +90,7 @@ class MatchActivity : BaseActivity<MatchPresenter>(), MatchView {
                 }
 
                 progressBar = progressBar {
+                    id = R.id.progressBar
                     indeterminateDrawable.setColorFilter(
                             ContextCompat.getColor(ctx, R.color.colorPrimary),
                             PorterDuff.Mode.SRC_IN
