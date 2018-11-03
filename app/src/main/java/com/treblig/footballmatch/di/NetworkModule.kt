@@ -14,27 +14,24 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
-
-object NetworkModule{
+open class NetworkModule {
     @Provides
     @Reusable
-    @JvmStatic
-    internal fun providePostApi(retrofit: Retrofit): TheSportApi {
+    open fun providePostApi(retrofit: Retrofit): TheSportApi {
         return retrofit.create(TheSportApi::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideLoggingInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+    open fun provideLoggingInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
 
     @Singleton
     @Provides
-    fun provideOkHttp(): OkHttpClient = OkHttpClient.Builder().addInterceptor(provideLoggingInterceptor()).build()
+    open fun provideOkHttp(): OkHttpClient = OkHttpClient.Builder().addInterceptor(provideLoggingInterceptor()).build()
 
     @Provides
     @Reusable
-    @JvmStatic
-    internal fun provideRetrofitInterface(): Retrofit {
+    open fun provideRetrofitInterface(): Retrofit {
         return Retrofit.Builder()
                 .baseUrl(BuildConfig.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())

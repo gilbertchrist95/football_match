@@ -11,6 +11,7 @@ abstract class BaseActivity<P : BasePresenter<BaseView>> : AppCompatActivity(), 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         presenter = instantiatePresenter()
+        presenter.inject()
     }
 
     protected abstract fun instantiatePresenter(): P

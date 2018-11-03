@@ -1,17 +1,21 @@
 package com.treblig.footballmatch.db
 
+import android.app.Application
 import android.content.Context
+import android.util.Log
 import com.treblig.footballmatch.pojo.Event
+import io.reactivex.Observable
+import io.reactivex.Single
 import org.jetbrains.anko.db.classParser
 import org.jetbrains.anko.db.delete
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 
-object MatchEventDB {
+class MatchEventDB(private val context: Context?) {
 
-    fun isExist(context: Context, eventId: String): Boolean {
+    fun isExist(eventId: String): Boolean {
         var isExist = false
-        context.database.use {
+        context?.database?.use {
             select(Event.TABLE_NAME)
                     .whereArgs("(${Event.EVENT_ID} = {eventId})", "eventId" to eventId).exec {
                         isExist = this.count > 0
@@ -20,9 +24,9 @@ object MatchEventDB {
         return isExist
     }
 
-    fun insert(context: Context, event: Event): Long {
+    fun insert(event: Event): Long {
         var rowId = 0L
-        context.database.use {
+        context?.database?.use {
             rowId = insert(Event.TABLE_NAME,
                     Event.AWAY_FORMATION to event.strAwayFormation,
                     Event.AWAY_GOAL_DETAILS to event.strAwayGoalDetails,
@@ -79,23 +83,32 @@ object MatchEventDB {
         return rowId
     }
 
-    fun delete(context: Context, eventId: String): Int {
-        var deleted: Int
-        context.database.use {
-            deleted =  delete(Event.TABLE_NAME, "(${Event.EVENT_ID} = {eventId})",
+    fun delete(eventId: String): Int {
+        var deleted: Int = 0
+        context?.database?.use {
+            deleted = delete(Event.TABLE_NAME, "(${Event.EVENT_ID} = {eventId})",
                     "eventId" to eventId)
+            return@use deleted
+        }
+        return deleted
+    }
+
+    fun deleteAll(): Int {
+        context?.database?.use {
+            val deleted = delete(Event.TABLE_NAME)
             return@use deleted
         }
         return 0
     }
 
-    fun getFavorites(context: Context): List<Event>? {
-        var result: List<Event>? = null
-        context.database.use {
+    fun getFavorites(): Observable<List<Event>> {
+        var result: List<Event> = listOf()
+        context?.database?.use {
             val cursor = select(Event.TABLE_NAME)
             result = cursor.parseList(classParser())
         }
-        return result
+
+        return Observable.just(result)
     }
 
 

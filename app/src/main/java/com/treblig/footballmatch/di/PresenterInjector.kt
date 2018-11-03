@@ -8,7 +8,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [(ContextModule::class), (NetworkModule::class)])
+@Component(modules = [(ContextModule::class), (NetworkModule::class), (DatabaseModule::class)])
 interface PresenterInjector {
 
     fun inject(matchPresenter: MatchPresenter)
@@ -20,6 +20,7 @@ interface PresenterInjector {
         fun build(): PresenterInjector
         fun networkModule(networkModule: NetworkModule): Builder
         fun contextModule(contextModule: ContextModule): Builder
+        fun databaseModule(datebaseModule: DatabaseModule): Builder
 
         @BindsInstance
         fun baseView(baseView: BaseView): Builder

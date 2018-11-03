@@ -1,9 +1,12 @@
 package com.treblig.footballmatch.ui.detail
 
 import com.treblig.footballmatch.api.TheSportApi
+import com.treblig.footballmatch.db.MatchEventDB
+import com.treblig.footballmatch.pojo.Event
 import com.treblig.footballmatch.pojo.Team
 import com.treblig.footballmatch.pojo.TeamResponse
 import com.treblig.footballmatch.util.SchedulerRule
+import com.treblig.footballmatch.util.TestContextProvider
 import io.reactivex.Observable
 import org.junit.Before
 import org.junit.Rule
@@ -22,6 +25,9 @@ class DetailPresenterTest {
     @Mock
     private lateinit var theSportApi: TheSportApi
 
+    @Mock
+    lateinit var matchEventDB: MatchEventDB
+
     private lateinit var presenter: DetailPresenter
 
     @get:Rule
@@ -30,8 +36,9 @@ class DetailPresenterTest {
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        presenter = DetailPresenter(view)
+        presenter = DetailPresenter(view, TestContextProvider())
         presenter.theSportApi = theSportApi
+        presenter.matchEventDB = matchEventDB
     }
 
     /**
@@ -40,7 +47,7 @@ class DetailPresenterTest {
      */
     @Test
     fun getTeamDetails_whenTeamResponseExist_shouldShowTeamDetail() {
-        val teamId = "4328"
+        val teamId = "1234"
         val teamResponse = whenTeamResponseExist()
 
         `when`(theSportApi.lookUpTeam(teamId))
@@ -59,7 +66,7 @@ class DetailPresenterTest {
      */
     @Test
     fun getTeamDetails_whenTeamResponseIsEmpty_shouldOnlyShowAndHideLoading() {
-        val teamId = "4328"
+        val teamId = "1234"
         val teamResponse = whenTeamResponseIsEmpty()
 
         `when`(theSportApi.lookUpTeam(teamId))
@@ -68,7 +75,6 @@ class DetailPresenterTest {
         presenter.getTeamDetail(teamId)
 
         verify(view).showLoading()
-        verify(view).showTeamDetail(teamResponse.teams!![0])
         verify(view).hideLoading()
     }
 
@@ -78,7 +84,7 @@ class DetailPresenterTest {
      */
     @Test
     fun getTeamDetails_whenNoInternetConnection_shouldShowError() {
-        val teamId = "4328"
+        val teamId = "1234"
         val exception = UnknownHostException("No Internet connection")
 
         `when`(theSportApi.lookUpTeam(teamId))
@@ -89,6 +95,31 @@ class DetailPresenterTest {
         verify(view).showLoading()
         verify(view).showError(exception)
         verify(view).hideLoading()
+    }
+
+    @Test
+    fun changeFavorite_whenRecordIsNotExist_shouldViewIsFavoriteWithParamIsFavoriteTrue() {
+        `when`(matchEventDB.isExist("576529")).thenReturn(false)
+        presenter.changeFavorite(Event(576529, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "576529", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null))
+        verify(view).setViewIsFavorites(true, true)
+    }
+
+    @Test
+    fun changeFavorite_whenRecordIsExist_shouldViewIsFavoriteWithParamIsFavoriteFalse() {
+        `when`(matchEventDB.isExist("576529")).thenReturn(true)
+        presenter.changeFavorite(Event(576529, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "576529", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null))
+        verify(view).setViewIsFavorites(false, true)
+    }
+
+    @Test
+    fun refreshFavorite_whenIsFavoriteTrue_shouldViewIsFavoriteWithParamTrue() {
+        `when`(matchEventDB.isExist("576529")).thenReturn(true)
+        presenter.refreshFavorite(whenEventExist())
+        verify(view).setViewIsFavorites(true, false)
+    }
+
+    private fun whenEventExist(): Event {
+        return Event(576529, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "576529", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
     }
 
     private fun whenTeamResponseExist(): TeamResponse {

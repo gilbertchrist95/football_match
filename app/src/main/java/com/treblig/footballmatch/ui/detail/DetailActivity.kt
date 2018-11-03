@@ -54,14 +54,16 @@ class DetailActivity : BaseActivity<DetailPresenter>(), DetailView {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return if (item?.itemId == android.R.id.home) {
-            finish()
-            true
-        } else if (item?.itemId == R.id.add_to_favorite) {
-            presenter.changeFavorite(matchEvent)
-            true
-        } else {
-            super.onOptionsItemSelected(item)
+        return when {
+            item?.itemId == android.R.id.home -> {
+                finish()
+                true
+            }
+            item?.itemId == R.id.add_to_favorite -> {
+                presenter.changeFavorite(matchEvent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -345,11 +347,11 @@ class DetailActivity : BaseActivity<DetailPresenter>(), DetailView {
         }
     }
 
-    fun showHomeTeamDetail(team: Team) {
+    private fun showHomeTeamDetail(team: Team) {
         Glide.with(this).load(team.strTeamBadge).into(imgHomeBadge)
     }
 
-    fun showAwayTeamDetail(team: Team) {
+    private fun showAwayTeamDetail(team: Team) {
         Glide.with(this).load(team.strTeamBadge).into(imgAwayBadge)
     }
 

@@ -13,7 +13,7 @@ class AppDatabaseOpenHelper(context: Context) : ManagedSQLiteOpenHelper(context,
         @Synchronized
         fun getInstance(context: Context): AppDatabaseOpenHelper {
             if (instance == null) {
-                instance = AppDatabaseOpenHelper(context.applicationContext)
+                instance = AppDatabaseOpenHelper(context)
             }
             return instance as AppDatabaseOpenHelper
         }
@@ -82,7 +82,7 @@ class AppDatabaseOpenHelper(context: Context) : ManagedSQLiteOpenHelper(context,
 }
 
 val Context.database: AppDatabaseOpenHelper
-    get() = AppDatabaseOpenHelper.getInstance(applicationContext)
+    get() = AppDatabaseOpenHelper.getInstance(context = this)
 
 
 

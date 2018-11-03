@@ -4,16 +4,21 @@ import com.treblig.footballmatch.api.TheSportApi
 import com.treblig.footballmatch.db.MatchEventDB
 import com.treblig.footballmatch.pojo.Event
 import com.treblig.footballmatch.ui.base.BasePresenter
+import com.treblig.footballmatch.util.CoroutineContextProvider
 import com.treblig.footballmatch.util.ioThread
 import com.treblig.footballmatch.util.mainThread
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
+import org.jetbrains.anko.coroutines.experimental.bg
 import javax.inject.Inject
 
-class DetailPresenter(detailView: DetailView) : BasePresenter<DetailView>(detailView) {
+class DetailPresenter(detailView: DetailView, private val context: CoroutineContextProvider = CoroutineContextProvider()) : BasePresenter<DetailView>(detailView) {
 
     @Inject
     lateinit var theSportApi: TheSportApi
+
+    @Inject
+    lateinit var matchEventDB: MatchEventDB
 
     fun getTeamDetail(teamId: String) {
         view.showLoading()
@@ -39,24 +44,27 @@ class DetailPresenter(detailView: DetailView) : BasePresenter<DetailView>(detail
     }
 
     fun refreshFavorite(event: Event) {
-        doAsync {
-            val isFavorite = MatchEventDB.isExist(view.getContext(), event.idEvent!!)
-            uiThread {
-                view.setViewIsFavorites(isFavorite)
+        async(context = context.main){
+            val isFavorite = bg {
+                matchEventDB.isExist(event.idEvent!!)
             }
+            view.setViewIsFavorites(isFavorite.await())
         }
     }
 
     fun changeFavorite(event: Event) {
-        doAsync {
-            val isFavorite = MatchEventDB.isExist(view.getContext(), event.idEvent!!)
-            when (isFavorite) {
-                true -> MatchEventDB.delete(view.getContext(), event.idEvent)
-                false -> MatchEventDB.insert(context = view.getContext(), event = event)
+        async(context.main) {
+            val isFavoriteData: Deferred<Boolean> = bg {
+                matchEventDB.isExist(event.idEvent!!)
             }
-
-            uiThread {
-                view.setViewIsFavorites(!isFavorite, true)
+            view.setViewIsFavorites(!isFavoriteData.await(), true)
+            when (isFavoriteData.await()) {
+                true -> bg {
+                    matchEventDB.delete(event.idEvent!!)
+                }
+                false -> bg {
+                    matchEventDB.insert(event = event)
+                }
             }
         }
     }
